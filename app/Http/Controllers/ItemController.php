@@ -12,6 +12,10 @@ use App\Models\client;
 
 class ItemController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware("auth:sanctum");
+    }
     /**
      * Display a listing of the resource.
      *
@@ -28,25 +32,18 @@ class ItemController extends Controller
         $items = DB::table('items')->where('name','like','%'.$queryName.'%')->get();
 
             // ->map(function ($item){
-            //     if($item->is_active == 1)
-            //     $item->is_active =true;
+            //     if($item->active == 1)
+            //     $item->active =true;
             //     else
-            //     $item->is_active =false;
+            //     $item->active =false;
             //     return $item;
             // });
         // $activeItems = Item::cursor()->filter(function ($iteme) {
-        //     return $iteme->is_active == false;
+        //     return $iteme->active == false;
         // });
 
-        // return $items;
-
-
-        $client = client::find(1);
-        return [
-            "client"=>$client,
-            "sold"=>$client->payments()];
-
-    }
+        return $items;
+ }
 
     /**
      * Show the form for creating a new resource.
@@ -69,7 +66,7 @@ class ItemController extends Controller
         Item::create([
             "name" => $request->input('name'),
             "price" => $request->input('price'),
-            "is_active" => $request->input('is_active') ?? false,
+            "active" => $request->input('active') ?? false,
         ]);
         return ["message"=>"Success"];
     }
@@ -107,7 +104,7 @@ class ItemController extends Controller
     {
         $item->name = $request->input('name') ?? $item->name;
         $item->price = $request->input('price') ?? $item->price;
-        $item->is_active = $request->input('is_active') ?? $item->is_active;
+        $item->active = $request->input('active') ?? $item->active;
         $item->save();
         $item->refresh();
         return $item;
@@ -125,9 +122,5 @@ class ItemController extends Controller
         return "sucess";
     }
 
-    public function relation(){
-        return [];
-        // $item = Item::find(1);
-        // return [$item,$item->soldItems()];
-    }
+    
 }

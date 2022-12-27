@@ -26,7 +26,7 @@ class StoreItemRequest extends FormRequest
         return [
             'name' => 'required',
             'price'=> 'required',
-            'is_active' => 'nullable'
+            'active' => 'nullable'
         ];
     }
 }

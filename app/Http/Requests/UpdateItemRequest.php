@@ -26,7 +26,7 @@ class UpdateItemRequest extends FormRequest
         return [
             'name' => 'nullable',
             'price'=> 'nullable',
-            'is_active'=> 'nullable'
+            'active'=> 'nullable'
         ];
     }
 }

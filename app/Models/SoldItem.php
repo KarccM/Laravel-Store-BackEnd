@@ -4,17 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\invoic;
-use App\Models\oreders;
+use App\Models\Invoice;
+use App\Models\Order;
 use App\Models\Item;
 
-class sold_items extends Model
+class SoldItem extends Model
 {
     use HasFactory;
 
+    protected $table  = 'solditems';
+
+    protected $fillable = ['order_id','invoice_id','price_at_moment','name_at_moment','quantity','item_id'];
 
     public function invoice(){
-        return $this->belongsTo(invoic::class);
+        return $this->belongsTo(Invoice::class);
     }
 
     public function item(){
@@ -22,6 +25,6 @@ class sold_items extends Model
     }
 
     public function order(){
-        return $this->belongsTo(oreders::class);
+        return $this->belongsTo(Order::class);
     }
 }

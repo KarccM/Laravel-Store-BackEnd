@@ -13,12 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('invoics', function (Blueprint $table) {
+        Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             $table->foreignId('client_id');
             $table->foreignId('user_id');
-            $table->foreignId('orders_id');
             $table->enum('status',['due', 'paid']);
             $table->integer('total');
             $table->integer('subtotal');
@@ -34,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('invoics');
+        Schema::dropIfExists('invoices');
     }
 };

@@ -19,8 +19,7 @@ return new class extends Migration
             $table->timestamps();
             $table->foreignId('client_id');
             $table->foreignId('user_id');
-            $table->foreignId('invoic_id');
-            $table->foreignId('sold_items_id');
+            $table->foreignId('invoice_id');
             $table->enum('status',['completed', 'shipped', 'pendding']);
         });
     }

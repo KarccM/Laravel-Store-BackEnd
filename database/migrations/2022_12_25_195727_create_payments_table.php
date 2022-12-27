@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamps();
             $table->foreignId('client_id');
             $table->foreignId('user_id');
-            $table->foreignId('invoic_id');
+            $table->foreignId('invoice_id');
             $table->boolean('active');
             $table->integer('amount');
 

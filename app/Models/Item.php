@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\sold_items as soldItems;
+use App\Models\SoldItem;
 
 class Item extends Model
 {
@@ -13,7 +13,7 @@ class Item extends Model
     public $timestamps = false;
 
     public function soldItems(){
-        return $this->hasMany(soldItems::class);
+        return $this->hasMany(SoldItem::class);
     }
 
 }

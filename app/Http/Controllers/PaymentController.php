@@ -2,67 +2,66 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Models\payment;
+use App\Models\Payment;
+use App\Models\Invoice;
+use App\Models\User;
+use App\Models\Client;
 
 
+//All Methods should work with exception handler
 class PaymentController extends Controller
 {
-   
-    public function index(Request $request)
-    {
-        // return $request->query('name');
-        
-        $queryName = $request->query('name') ?? '';
-        
-        // $items = collect(Item::where("name",$queryName)->first());
-
-        $items = DB::table('items')->where('name','like','%'.$queryName.'%')->get();
-
-            // ->map(function ($item){
-            //     if($item->is_active == 1)
-            //     $item->is_active =true;
-            //     else
-            //     $item->is_active =false;
-            //     return $item;
-            // });
-        // $activeItems = Item::cursor()->filter(function ($iteme) {
-        //     return $iteme->is_active == false;
-        // });
-        return $items;
-
+    public function __construct() {
+        $this->middleware("auth:sanctum");
     }
 
-    public function store(Request $request)
-    {
-        Item::create([
-            "name" => $request->input('name'),
-            "price" => $request->input('price'),
-            "is_active" => $request->input('is_active') ?? false,
-        ]);
-        return ["message"=>"Success"];
+    public function index() {
+        return [];
     }
 
-    public function show(payment $item)
-    {
-        return $item;
+   public function bulkDelete(Request $request){
+    try {
+        Payment::destroy(collect($request->input('ids')));
+    }catch(Exception $e){
+        // not worked well
+        return "error";
+    }
+    return "GG";
+   }
+
+   public function update(){
+        return [];
+   }
+
+   public function delete(Payment $payment){
+    Payment::destroy($payment);
+   }
+
+    public function getInvoice($id){
+        $invoice = Invoice::find($id);
+        return [
+            "invoice"=>$invoice,
+            "payments"=>$invoice->payments
+        ];
     }
 
-    public function update(Request $request, payment $payment)
-    {
-        $item->name = $request->input('name') ?? $item->name;
-        $item->price = $request->input('price') ?? $item->price;
-        $item->is_active = $request->input('is_active') ?? $item->is_active;
-        $item->save();
-        $item->refresh();
-        return $item;
+   public function getUser($id){
+        $user = User::find($id);
+        return [
+            "user"=>$user,
+            "payments"=>$user->payments
+        ];
     }
 
-    public function destroy(Item $item)
-    {
-        $item->delete();
-        return "sucess";
+   public function getClient($id){
+        $client = Client::find($id);
+        return [
+            "client"=>$client,
+            "payments"=>$client->payments
+        ];
     }
 
 }

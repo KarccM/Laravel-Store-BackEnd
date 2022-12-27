@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use App\Models\payment;
-use App\Models\client;
+use App\Models\Payment;
+use App\Models\Client;
 
 
 class User extends Authenticatable
@@ -45,10 +45,10 @@ class User extends Authenticatable
     ];
 
     public function payments(){
-        return $this->hasMany(payment::class);
+        return $this->hasMany(Payment::class);
     }
     
     public function clients(){
-        return $this->hasMany(client::class);
+        return $this->hasMany(Client::class);
     }
 }
