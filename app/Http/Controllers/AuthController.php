@@ -2,22 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+
+use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
- 
-class LoginController extends Controller
+
+class AuthController extends Controller
 {
-    public function login(Request $request){
-        $credentials = $request->only("username", "password");
+
+    public function login(LoginRequest $request){
+        $credentials = $request->only("email", "password");
         $request_user = $request->validate([
-            "username"=> 'required',
+            "email"=> 'required',
             "password"=> 'required',
         ]);
-        $user = User::where('username', $request_user['username'])->first();
+        $user = User::where('email', $request_user['email'])->first();
 
 
-        // if (auth()->attempt(["username"=>$request_user['username'] , "password"=>$request_user['password']])) {
+        // if (auth()->attempt(["email"=>$request_user['email'] , "password"=>$request_user['password']])) {
         //     // return $user->createToken($request->device_name)->plainTextToken;
         //     return [];
         // }

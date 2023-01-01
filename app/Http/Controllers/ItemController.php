@@ -14,7 +14,7 @@ class ItemController extends Controller
 {
     public function __construct()
     {
-        $this->middleware("auth:sanctum");
+        // $this->middleware("auth:sanctum");
     }
     /**
      * Display a listing of the resource.
@@ -24,9 +24,9 @@ class ItemController extends Controller
     public function index(Request $request)
     {
         // return $request->query('name');
-        
+
         $queryName = $request->query('name') ?? '';
-        
+
         // $items = collect(Item::where("name",$queryName)->first());
 
         $items = DB::table('items')->where('name','like','%'.$queryName.'%')->get();
@@ -77,8 +77,9 @@ class ItemController extends Controller
      * @param  \App\Models\Item  $item
      * @return \Illuminate\Http\Response
      */
-    public function show(Item $item)
+    public function show($id)
     {
+        $item = Item::find($id);
         return $item;
     }
 
@@ -100,8 +101,9 @@ class ItemController extends Controller
      * @param  \App\Models\Item  $item
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateItemRequest $request, Item $item)
+    public function update(UpdateItemRequest $request,$id)
     {
+        $item = Item::find($id);
         $item->name = $request->input('name') ?? $item->name;
         $item->price = $request->input('price') ?? $item->price;
         $item->active = $request->input('active') ?? $item->active;
@@ -116,11 +118,12 @@ class ItemController extends Controller
      * @param  \App\Models\Item  $item
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Item $item)
+    public function destroy($id)
     {
+        $item = Item::find($id);
         $item->delete();
         return "sucess";
     }
 
-    
+
 }

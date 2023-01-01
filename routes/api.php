@@ -1,21 +1,26 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\TestController;
-use App\Http\Controllers\LoginController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\AuthController;
+
 
 //Auth
-Route::post('/login',[LoginController::class , 'login']);
+Route::post('/login',[AuthController::class , 'login']);
 Route::post('/register',[UserController::class , 'register']);
 
 //Items
 Route::prefix('item')->group(function (){
-    Route::apiResource('',ItemController::class);
+    // Route::apiResource('',ItemController::class);
+    Route::get('/' , [ItemController::class , 'index']);
+    Route::post('/' , [ItemController::class , 'store']);
+    Route::put('/{id}' , [ItemController::class , 'update']);
+    Route::delete('/{id}' , [ItemController::class , 'destroy']);
+    Route::get('/{id}',[ItemController::class,'show']);
 });
 
 //Payments

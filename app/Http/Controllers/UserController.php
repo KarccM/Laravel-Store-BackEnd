@@ -10,19 +10,19 @@ class UserController extends Controller
     //
     public function register(Request $request){
         $request_user = $request->validate([
-            "username"=> 'required',
-            "password"=> 'required|unique:users,username',
-            "is_active"=> 'nullable'
+            "email"=> 'required',
+            "password"=> 'required',
+            "active"=> 'nullable'
         ]);
         $user = User::create([
-            "username"=> $request_user['username'],
+            "email"=> $request_user['email'],
             "password"=> $request_user['password'],
-            "is_active"=> $request_user['is_active'] ?? true,
+            "active"=> $request_user['active'] ?? true,
         ]);
         return [
             "user" => $user,
             "token" => $user->createToken('app-secret')->plainTextToken
         ];
-        
+
     }
 }

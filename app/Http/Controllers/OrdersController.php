@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Arr;
+use App\Http\Requests\OrderStoreRequest;
 use Illuminate\Support\Facades\DB;
 use App\Models\Client;
 use App\Models\Invoice;
@@ -12,47 +11,42 @@ use App\Models\Payment;
 use App\Models\Order;
 use App\Models\Item;
 use App\Models\SoldItem;
+// use Illuminate\Support\Facades\Auth;
+
+
+
 
 
 class OrdersController extends Controller
 {
+
     public function __construct()
     {
+        // $this->middleware('cors');
         $this->middleware("auth:sanctum");
     }
 
     //re make validation here
-    public function store(Request $request){
-        $validated = $request->validate([
-            "items" => 'required',
-            "items.*.id" => 'required',
-            "items.*.name" => 'required',
-            "items.*.quantity" => 'required',
-            "client" => 'required',
-            "payment" => 'required',
-        ]);
-
+    public function store(OrderStoreRequest $request){
         $user = auth()->user();
-
         DB::beginTransaction();
         try {
             $client = Client::updateOrCreate(
-                ["name"=> $validated['client']['name']],
+                ["name"=> $request['client']['name']],
                 [
-                    "address" => $validated['client']['address'],
-                    "phone" => $validated['client']['phone'],
+                    "address" => $request['client']['address'],
+                    "phone" => $request['client']['phone'],
                 ]
             );
-
             //Before I should Check for state of every Item an Make Sure The Price that send from frontend is equal to price in database then do this
-            $realItems = collect($validated['items'])->map(function($item){
+            $realItems = collect($request['items'])->map(function($item){
                 return [ ...$item  , "total"=> ($item['price'] * $item['quantity'])];
             });
 
-            $discount = isset($validated['payment']['discount'])? $validated['payment']['discount']/100 : 0;
+            $discount = isset($request['payment']['discount'])? $request['payment']['discount']/100 : 0;
             $totalPricesWithoutDiscount = $realItems->sum->total;
             $total = $totalPricesWithoutDiscount - ($totalPricesWithoutDiscount * $discount) ;
-            $subtotal = $validated['payment']['amount'];
+            $subtotal = $request['payment']['amount'];
             $invoice = Invoice::create([
                 'total' => $total,
                 'subtotal' => $subtotal ,
@@ -84,7 +78,7 @@ class OrdersController extends Controller
                     'order_id' => $order->id,
                     'item_id' => $item['id'],
                     'price_at_moment' => $item['price'],
-                    'name_at_moment' => $item['name'],
+                    'name_at_moment' => $item['name'] ?? 'unk',
                     'quantity' => $item['quantity']
                 ]);
             }
@@ -100,7 +94,7 @@ class OrdersController extends Controller
     }
 
     //filters
-    public function index(){
+    public function index(Request $request){;
         return Order::with(['user','client','soldItems','invoice'])->get()
         ->filter(function($order){
             return $order->active == true;
@@ -108,10 +102,13 @@ class OrdersController extends Controller
         ->map(function ($order){
             return [
                 "id" => $order->id,
-                "user" => $order->user,
-                "client" => $order->client,
-                "invoice" => $order->invoice,
-                "soldItems" => $order->soldItems,
+                "user" => $order->user->email,
+                "client" => $order->client->name,
+                "order_status" => $order->status,
+                "invoice_status" => $order->invoice->status,
+                "total"=>$order->invoice->total,
+                "subtotal"=>$order->invoice->subtotal,
+                "discount"=>$order->invoice->discount
             ];
         });
     }
