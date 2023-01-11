@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('client_id');
             $table->foreignId('user_id');
             $table->foreignId('invoice_id');
-            $table->enum('status',['completed', 'shipped', 'pendding']);
+            $table->enum('status',['completed', 'shipped', 'pending']);
         });
     }
 

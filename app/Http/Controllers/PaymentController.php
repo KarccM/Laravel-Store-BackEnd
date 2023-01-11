@@ -9,6 +9,8 @@ use App\Models\Payment;
 use App\Models\Invoice;
 use App\Models\User;
 use App\Models\Client;
+use App\Models\Order;
+use App\Trait\CustomResponse;
 
 
 //All Methods should work with exception handler
@@ -42,26 +44,31 @@ class PaymentController extends Controller
 
     public function getInvoice($id){
         $invoice = Invoice::find($id);
-        return [
+        return CustomResponse::success([
             "invoice"=>$invoice,
             "payments"=>$invoice->payments
-        ];
+        ]);
     }
 
    public function getUser($id){
         $user = User::find($id);
-        return [
+        return CustomResponse::success([
             "user"=>$user,
-            "payments"=>$user->payments
-        ];
+            "payments"=>$user->epayments
+        ]);
     }
 
-   public function getClient($id){
-        $client = Client::find($id);
-        return [
+    public function getClient($name){
+        $client = Client::with('payments')->where('name','like','%'.$name.'%')->get();
+        return CustomResponse::success([
             "client"=>$client,
-            "payments"=>$client->payments
-        ];
+            // "payments"=>$client->payments
+        ]);
+    }
+
+    public function getOrder($id){
+        $order = Order::find($id);
+        return $this->getInvoice($order->invoice_id);
     }
 
 }

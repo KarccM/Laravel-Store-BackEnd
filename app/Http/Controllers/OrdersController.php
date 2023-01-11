@@ -11,8 +11,7 @@ use App\Models\Payment;
 use App\Models\Order;
 use App\Models\Item;
 use App\Models\SoldItem;
-// use Illuminate\Support\Facades\Auth;
-
+use App\Trait\CustomResponse;
 
 
 
@@ -38,14 +37,17 @@ class OrdersController extends Controller
                     "phone" => $request['client']['phone'],
                 ]
             );
-            //Before I should Check for state of every Item an Make Sure The Price that send from frontend is equal to price in database then do this
+            //Before I should Check for state of every Item an Make Sure The Price that send from frontend is equal
+            //to price in database then do this
+
             $realItems = collect($request['items'])->map(function($item){
                 return [ ...$item  , "total"=> ($item['price'] * $item['quantity'])];
             });
 
-            $discount = isset($request['payment']['discount'])? $request['payment']['discount']/100 : 0;
+            $discount = isset($request['payment']['discount'])? $request['payment']['discount'] : 0;
+            $discount100 = $request['payment']['discount']/100;
             $totalPricesWithoutDiscount = $realItems->sum->total;
-            $total = $totalPricesWithoutDiscount - ($totalPricesWithoutDiscount * $discount) ;
+            $total = $totalPricesWithoutDiscount - ($totalPricesWithoutDiscount * $discount100) ;
             $subtotal = $request['payment']['amount'];
             $invoice = Invoice::create([
                 'total' => $total,
@@ -68,7 +70,7 @@ class OrdersController extends Controller
                 'client_id' => $client->id,
                 'user_id' => $user->id,
                 'invoice_id' => $invoice->id,
-                'status' => 'completed',
+                'status' => $total == $subtotal ? 'completed':'shipped',
                 'active' => true
             ]);
 
@@ -85,7 +87,7 @@ class OrdersController extends Controller
 
 
             DB::commit();
-            return $order;
+            return CustomResponse::success($order,'Order Created');
         } catch (\Exception $ex) {
             DB::rollback();
             return response()->json(['error' => $ex->getMessage()], 500);
@@ -95,7 +97,7 @@ class OrdersController extends Controller
 
     //filters
     public function index(Request $request){;
-        return Order::with(['user','client','soldItems','invoice'])->get()
+        return CustomResponse::success(Order::with(['user','client','soldItems','invoice'])->get()
         ->filter(function($order){
             return $order->active == true;
         })
@@ -110,27 +112,36 @@ class OrdersController extends Controller
                 "subtotal"=>$order->invoice->subtotal,
                 "discount"=>$order->invoice->discount
             ];
-        });
+        }),"All Orders");
     }
 
-    public function update(Request $request,Order $order){
-        //delete perv sold items
-        //add new sold items
+    public function update(Request $request,$id){
+        $order = Order::find($id);
+        //  read prev items and delete if quantity 0 and change if not
+        //  add new items
+        //  calculate their prices
+        //  get prev payments
+        //  add new paymemt
+        //  update order (state and items)
+        //  save
 
         //edit payments => delete prev and add new
+        return CustomResponse::success([$request->input() , $order]);
 
     }
 
-    public function addPayment(Request $request){
+    public function addPayment($id){
 
     }
 
-    public function show(Order $order){
-        return $order;
+    public function getOne($id){
+        $order = Order::where('id' , '=' ,$id)->withAll()->get()[0]; // not sure
+        return CustomResponse::success(collect($order));
+
     }
 
     public function delete(Order $order){
         $oredr->active = false;
-        return "success";
+        return CustomResponse::success([]);
     }
 }

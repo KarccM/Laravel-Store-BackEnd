@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\TestController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\AuthController;
@@ -11,7 +10,7 @@ use App\Http\Controllers\AuthController;
 
 //Auth
 Route::post('/login',[AuthController::class , 'login']);
-Route::post('/register',[UserController::class , 'register']);
+Route::post('/register',[AuthController::class , 'register']);
 
 //Items
 Route::prefix('item')->group(function (){
@@ -30,7 +29,8 @@ Route::prefix('payments')->group(function(){
     Route::delete('/{id}' , [PaymentController::class , 'delete']);
     Route::get('/invoice/{id}' , [PaymentController::class , 'getInvoice']);
     Route::get('/user/{id}' , [PaymentController::class , 'getUser']);
-    Route::get('/client/{id}' , [PaymentController::class , 'getClient']);
+    Route::get('/client/{name}' , [PaymentController::class , 'getClient']);
+    Route::get('/order/{id}' , [PaymentController::class , 'getOrder']);
 });
 Route::post('/payments-delete',[PaymentController::class,'bulkDelete']);
 
@@ -38,6 +38,8 @@ Route::post('/payments-delete',[PaymentController::class,'bulkDelete']);
 Route::prefix('orders')->group(function (){
     Route::get('/' , [OrdersController::class , 'index']);
     Route::post('/' , [OrdersController::class , 'store']);
+    Route::get('/{id}', [OrdersController::class , 'getOne']);
+    Route::put('/{id}', [OrdersController::class , 'update']);
 });
 
 

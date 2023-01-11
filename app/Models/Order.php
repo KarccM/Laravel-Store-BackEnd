@@ -24,12 +24,17 @@ class Order extends Model
     public function soldItems(){
         return $this->hasMany(SoldItem::class);
     }
-    
+
     public function user(){
         return $this->belongsTo(User::class);
     }
 
     public function client(){
         return $this->belongsTo(Client::class);
+    }
+
+    public function scopeWithAll($query)
+    {
+        $query->with('invoice', 'user', 'client' , 'solditems');
     }
 }

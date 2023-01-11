@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 class SoldItemsController extends Controller
 {
-    //
+    public function delete($id){
+        $solditem = SoldItem::find($id);
+        $solditem->delete();
+        return "deleted";
+    }
 }

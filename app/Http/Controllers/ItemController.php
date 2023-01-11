@@ -7,14 +7,14 @@ use App\Http\Requests\UpdateItemRequest;
 use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Trait\CustomResponse;
 
-use App\Models\client;
 
 class ItemController extends Controller
 {
     public function __construct()
     {
-        // $this->middleware("auth:sanctum");
+        $this->middleware("auth:sanctum");
     }
     /**
      * Display a listing of the resource.
@@ -23,27 +23,27 @@ class ItemController extends Controller
      */
     public function index(Request $request)
     {
-        // return $request->query('name');
-
+        // if(auth()->user()->tokenCan('list'))
+        //  return CustomResponse::failed([],'unauthorized');
         $queryName = $request->query('name') ?? '';
+        $active = $request->query('active') ?? null;
+        $price = $request->query('price') ?? null;
 
-        // $items = collect(Item::where("name",$queryName)->first());
+        $itemsQuery =Item::where('name','like','%'.$queryName.'%');
+        if($active){
+            if($active == 'true') $active = 1;
+            else $active = 0;
+            $itemsQuery = $itemsQuery->where('active' , 'like',$active);
+        }
 
-        $items = DB::table('items')->where('name','like','%'.$queryName.'%')->get();
+        if($price){
+            $itemsQuery = $itemsQuery->where('price' , '>=',$price);
+        }
 
-            // ->map(function ($item){
-            //     if($item->active == 1)
-            //     $item->active =true;
-            //     else
-            //     $item->active =false;
-            //     return $item;
-            // });
-        // $activeItems = Item::cursor()->filter(function ($iteme) {
-        //     return $iteme->active == false;
-        // });
+        $items = $itemsQuery->get();
 
-        return $items;
- }
+        return CustomResponse::success($items,"All Items");
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -63,24 +63,23 @@ class ItemController extends Controller
      */
     public function store(StoreItemRequest $request)
     {
-        Item::create([
+        $item = Item::create([
             "name" => $request->input('name'),
             "price" => $request->input('price'),
-            "active" => $request->input('active') ?? false,
+            "active" => $request->input('active') ?? true,
         ]);
-        return ["message"=>"Success"];
+        return CustomResponse::success($item,"Add New Item Success");
     }
 
     /**
      * Display the specified resource.
-     *
      * @param  \App\Models\Item  $item
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
         $item = Item::find($id);
-        return $item;
+        return CustomResponse::success($item,"Item Found");
     }
 
     /**
@@ -109,7 +108,7 @@ class ItemController extends Controller
         $item->active = $request->input('active') ?? $item->active;
         $item->save();
         $item->refresh();
-        return $item;
+        return CustomResponse::success($item,"Update Success");
     }
 
     /**
@@ -122,7 +121,7 @@ class ItemController extends Controller
     {
         $item = Item::find($id);
         $item->delete();
-        return "sucess";
+        return CustomResponse::success([],"Delete Success");
     }
 
 

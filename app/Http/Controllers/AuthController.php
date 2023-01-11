@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 
 use App\Http\Requests\LoginRequest;
-use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -28,7 +27,25 @@ class AuthController extends Controller
         }
         return [
             "user" => $user,
+            "token" => $user->createToken('app-secret',['list'])->plainTextToken
+        ];
+    }
+
+     public function register(Request $request){
+        $request_user = $request->validate([
+            "email"=> 'required',
+            "password"=> 'required',
+            "active"=> 'nullable'
+        ]);
+        $user = User::create([
+            "email"=> $request_user['email'],
+            "password"=> $request_user['password'],
+            "active"=> $request_user['active'] ?? true,
+        ]);
+        return [
+            "user" => $user,
             "token" => $user->createToken('app-secret')->plainTextToken
         ];
+
     }
 }
